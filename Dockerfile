@@ -60,3 +60,10 @@ ENTRYPOINT ["/entrypoint.sh"]
 WORKDIR /src
 EXPOSE 3000
 CMD ["bundle", "exec", "rails", "s", "-p", "3000", "-b", "0.0.0.0"]
+
+FROM base AS rspec-tests
+
+COPY Gemfile Gemfile.lock .
+ENV RAILS_ENV test
+RUN bundle install
+RUN --network=host bundle exec rspec
