@@ -26,6 +26,7 @@ Your responsibilities will be:
   > upgraded `mimemagic` to 3.10 and ran `bundle update mimemagic`
 - install JS dependencies `yarn`
 - specify your DB credentials in `.env` if necessary for your postgres setup
+  > used `environment` section in `docker-compose.yml`
 - create and seed the DB with `bundle exec rails db:setup`
 - run rails server `bundle exec rails s`
 - recommended that you use `bin/webpack-dev-server` for speedy react development
@@ -34,6 +35,7 @@ Your responsibilities will be:
 
 - Run ruby test suite with `rspec`
 - Run JS test suite with `yarn test`
+  > tried with latest node and could not install packages, works with 12.8.1
 
 ## Submission:
 

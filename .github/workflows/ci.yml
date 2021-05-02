@@ -2,47 +2,48 @@ name: CI
 on: push
 
 jobs:
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2.3.4
-      - name: Is Valid?
-        run: docker-compose config
-
   test-api:
     name: Test API
     runs-on: ubuntu-latest
-    services:
-      db:
-        image: postgres:13.2-alpine
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_DB: react_rails_code_challenge_test
-          POSTGRES_USER: majority-labs
-          POSTGRES_PASSWORD: password
+    env:
+      DOCKER_BUILDKIT: 1
+      COMPOSE_DOCKER_CLI_BUILD: 1
     steps:
       - name: Checkout
         uses: actions/checkout@v2.3.4
-      - name: Build & Test
-        env:
-          DOCKER_BUILDKIT: 1
-        run: |
-          docker build -t majority-labs/api:${{ github.sha }} \
-            --build-arg BUILDKIT_INLINE_CACHE=1 \
-            --network=host \
-            --target rspec-tests \
-            .
-      - name: Scan Image for Vulnerabilities
-        uses: docker://docker.io/aquasec/trivy:0.2.1
-        continue-on-error: true
-        timeout-minutes: 5
+      - name: Cache
+        uses: actions/cache@v2.1.5
         with:
-          args: >
-            --cache-dir /var/lib/trivy
-            --severity "CRITICAL"
-            --exit-code 1
-            --no-progress
-            majority-labs/api:${{ github.sha }}
+          path: vendor/bundle-docker
+          key: bundler-${{ hashFiles('Dockerfile') }}-${{ hashFiles('Gemfile', 'Gemfile.lock') }}
+          restore-keys: |
+            bundler-${{ hashFiles('Dockerfile') }}-${{ hashFiles('Gemfile', 'Gemfile.lock') }}
+            bundler-${{ hashFiles('Dockerfile') }}-
+      - name: Build & Test
+        run: |
+          docker-compose build
+          docker-compose run api sh -c "bundle install && yarn install --check-files && bundle exec rails db:setup && bundle exec rspec"
+
+  test-web:
+    name: Test Web
+    runs-on: ubuntu-latest
+    container: node:12.8.1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Cache
+        uses: actions/cache@v2.1.5
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+            ${{ runner.os }}-yarn-
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile --non-interactive
+      - name: Test
+        run: yarn test
