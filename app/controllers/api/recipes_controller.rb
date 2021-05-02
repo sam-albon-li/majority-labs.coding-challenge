@@ -16,13 +16,13 @@ module Api
         @recipes = @recipes.where(id: recipeIds)
       end
 
-      render json: @recipes
+      render json: @recipes.limit(100)
     end
 
     def ingredients_index
       @ingredients = ::Ingredient.all
 
-      render json: @ingredients
+      render json: @ingredients.limit(100)
     end
   end
 end
