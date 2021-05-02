@@ -26,3 +26,14 @@ services:
       POSTGRES_DB: react_rails_code_challenge_development
       POSTGRES_USER: majority-labs
       POSTGRES_PASSWORD: password
+
+  db-admin:
+    image: dpage/pgadmin4:latest
+    ports:
+      - 8081:8081
+    environment:
+      PGADMIN_LISTEN_PORT: 8081
+      PGADMIN_DEFAULT_EMAIL: dev@example.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    depends_on:
+      - db
