@@ -21,6 +21,9 @@ Your responsibilities will be:
 
 - clone this repository
 - install ruby dependencies `bundle install`
+  > resolved issue `mimemagic` gems being pulled due to licensing issues
+  >
+  > upgraded `mimemagic` to 3.10 and ran `bundle update mimemagic`
 - install JS dependencies `yarn`
 - specify your DB credentials in `.env` if necessary for your postgres setup
 - create and seed the DB with `bundle exec rails db:setup`
