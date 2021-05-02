@@ -1,0 +1,28 @@
+version: "3.7"
+
+services:
+  api:
+    build:
+      context: .
+      target: base
+    command: sh -c "bundle install && bundle exec rails db:setup && bundle exec rails s -p 3000 -b 0.0.0.0"
+    ports:
+      - 3000:3000
+    environment:
+      RAILS_ENV: development
+      BUNDLE_PATH: /src/vendor/bundle-docker
+      DB_USERNAME: majority-labs
+      DB_PASSWORD: password
+      DB_HOST: db
+    volumes:
+      - .:/src:cached
+    depends_on:
+      - db
+
+  db:
+    image: postgres:13.2-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: react_rails_code_challenge_development
+      POSTGRES_USER: majority-labs
+      POSTGRES_PASSWORD: password
