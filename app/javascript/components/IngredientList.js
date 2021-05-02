@@ -6,59 +6,49 @@ import axios from "axios";
 const IngredientList = ({ handleChange }) => {
   const [ingredients, setIngredients] = useState([]);
 
-  const listIngredients = () => {
+  const [checkedIngredientIds, setCheckedIngredientIds] = useState([]);
+
+  const toggleCheckedIngredient = ({ id }) => {
+    if (checkedIngredientIds.includes(id)) {
+      setCheckedIngredientIds(checkedIngredientIds.filter(obj => obj !== id));
+    } else {
+      setCheckedIngredientIds([...checkedIngredientIds, id]);
+    }
+  };
+
+  useEffect(() => handleChange(checkedIngredientIds), [checkedIngredientIds]);
+
+  useEffect(() => {
+    axios.get("/api/ingredients").then(response => {
+      setIngredients(response.data);
+    });
+  }, []);
+
+  const ListIngredients = () => {
     if (ingredients.length < 1) {
       return <>Loading...</>;
     } else {
-      return ingredients.map((ingredient) => (
+      return ingredients.map(({ id, name }) => (
         <ListGroup.Item
-          key={`ingredient-${ingredient.id}`}
-          onClick={(e) => handleClick(e, ingredient.id)}
-          data-elemtype="ingredient-wrapper"
+          key={`ingredient-${id}`}
+          onClick={() => toggleCheckedIngredient({ id })}
         >
           <Form.Check
             inline
-            id={`ingredient-${ingredient.id}-checkbox`}
-            data-ingredient-id={ingredient.id}
+            checked={checkedIngredientIds.includes(id)}
+            id={`ingredient-${id}-checkbox`}
           />
-          <Form.Label
-            htmlFor={`ingredient-${ingredient.id}-checkbox`}
-            data-elemtype="ingredient-label"
-          >
-            {ingredient.name}
-          </Form.Label>
+          <Form.Label htmlFor={`ingredient-${id}-checkbox`}>{name}</Form.Label>
         </ListGroup.Item>
       ));
     }
   };
 
-  const handleClick = (e, ingredientId) => {
-    const checkbox = document.querySelector(
-      `[data-ingredient-id='${ingredientId}']`
-    );
-
-    switch (e.target.dataset.elemtype) {
-      case "ingredient-wrapper":
-        // handle click on list group
-        checkbox.checked = !checkbox.checked;
-        handleChange(checkbox.checked, ingredientId);
-      case "ingredient-label":
-        // label click fires event twice; rely on only checkbox event
-        return;
-      default:
-        handleChange(checkbox.checked, ingredientId);
-    }
-  };
-
-  useEffect(() => {
-    axios.get("/api/ingredients").then((response) => {
-      setIngredients(response.data);
-    });
-  }, []);
-
   return (
     <Form>
-      <ListGroup>{listIngredients()}</ListGroup>
+      <ListGroup>
+        <ListIngredients />
+      </ListGroup>
     </Form>
   );
 };

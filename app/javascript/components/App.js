@@ -7,22 +7,15 @@ import RecipeList from "./RecipeList";
 
 const App = () => {
   const [ingredientIds, setIngredientIds] = useState([]);
-  const changeIngredientIds = (checked, id) => {
-    setIngredientIds(
-      checked
-        ? ingredientIds.concat(id)
-        : ingredientIds.filter((val) => val != id)
-    );
-  };
 
   return (
     <Container className="col-12 mt-3">
       <Row className="justify-content-md-center mb-3">
-        <h1> Let's Find Some Recipes! </h1>
+        <h1>Let's Find Some Recipes!</h1>
       </Row>
       <Row>
         <Col className="col-4">
-          <IngredientList handleChange={changeIngredientIds} />
+          <IngredientList handleChange={setIngredientIds} />
         </Col>
         <Col className="col-8">
           <RecipeList ingredientIds={ingredientIds} />
