@@ -31,6 +31,13 @@ Your responsibilities will be:
 - run rails server `bundle exec rails s`
 - recommended that you use `bin/webpack-dev-server` for speedy react development
 
+### In Docker
+
+1. Install docker
+2. Install docker compose
+3. Run `docker-compose up` from root of repository
+4. Navigate to http://localhost:3000/ in browser
+
 ## Tests:
 
 - Run ruby test suite with `rspec`
