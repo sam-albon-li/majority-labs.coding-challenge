@@ -15,13 +15,19 @@ const RecipeList = ({ ingredientIds }) => {
       .then(({ data }) => setRecipes(data));
   }, [ingredientIds]);
 
-  const ListRecipes = () => (
-    <ul>
-      {recipes.map(({ name }) => (
-        <li>{name}</li>
-      ))}
-    </ul>
-  );
+  const ListRecipes = () => {
+    if (!recipes.length) {
+      return <div>No recipes found!</div>;
+    }
+
+    return (
+      <ul>
+        {recipes.map(({ name }) => (
+          <li>{name}</li>
+        ))}
+      </ul>
+    );
+  };
 
   return (
     <ListGroup>
